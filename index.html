@@ -282,7 +282,7 @@ setInterval(function(){if(lastPct<88)setPct(lastPct+.12);},1000);
 <script>
 (function(){
 var a=document.getElementById("ncmusic"),btn=document.getElementById("ncmute");if(!a||!a.play)return;
-var VOL=0.35,LOOP_START=13.714,LOOP_END=157.714,muted=false,level=0,target=VOL,fadeT=null,done=false,started=false;
+var VOL=0.35,LOOP_START=0,LOOP_END=114.85,muted=false,level=0,target=VOL,fadeT=null,done=false,started=false;
 try{muted=window.localStorage&&localStorage.getItem("nc_music_muted")==="1";}catch(e){}
 function paint(){btn.className=muted?"off":"";btn.innerHTML=muted?"&#215;":"&#9835;";}
 function apply(){try{a.volume=Math.max(0,Math.min(1,muted?0:level));}catch(e){}}
