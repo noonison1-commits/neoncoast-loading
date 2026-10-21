@@ -257,16 +257,19 @@ var tips=["Press F4 for jobs, shops and your character.","Lock your car. Neon Co
  "Rejoins are fast: content you already have is not downloaded again.","Hold C for the context menu, Q for the quick wheel.",
  "Need staff? Use the report menu instead of yelling in OOC.","Keep cash in the bank. What you carry, you can lose."];
 var ti=Math.floor(Math.random()*tips.length);txt("tip",tips[ti]);
-setInterval(function(){var t=$("tip");t.style.opacity=0;setTimeout(function(){ti=(ti+1)%tips.length;txt("tip",tips[ti]);t.style.opacity=1;},500);},7000);
+setInterval(function(){if(window.NCStageLock&&Date.now()-window.NCStageLock<20000)return;var t=$("tip");t.style.opacity=0;setTimeout(function(){ti=(ti+1)%tips.length;txt("tip",tips[ti]);t.style.opacity=1;},500);},7000);
 if(P.map&&P.map.indexOf("%")<0)txt("map",P.map);if(P.name)txt("server",P.name);
 if(P.players)txt("plw","  ·  "+P.players+(P.max?"/"+P.max:"")+" online");
 window.GameDetails=function(servername,serverurl,mapname,maxplayers,steamid,gamemode){
  if(servername)txt("server",servername);if(mapname)txt("map",mapname);
- if(maxplayers&&!$("plw").firstChild)txt("plw","  ·  "+maxplayers+" slots");txt("status","Joining Neon Coast...");setPct(3);};
+ if(maxplayers&&!$("plw").firstChild)txt("plw","  ·  "+maxplayers+" slots");txt("status","Joining Neon Coast...");setPct(3);try{txt("tip","Step 1 of 5 — Connecting to the server");window.NCStageLock=Date.now();}catch(e){}};
 window.SetFilesTotal=function(n){total=Math.max(0,parseInt(n,10)||0);needed=total;got=0;setPct(5);};
 window.SetFilesNeeded=function(n){needed=Math.max(0,parseInt(n,10)||0);if(total>0){got=total-needed;setPct(5+85*(got/total));}};
 window.DownloadingFile=function(f){got++;if(total>0)setPct(5+85*Math.min(1,got/total));fileLine(f);};
-window.SetStatusChanged=function(s){s=String(s||"");txt("status",s);
+var STAGES=[[/workshop|mounting/i,"Step 2 of 5 — Loading Neon Coast content"],[/download|retrieving|server cache|cache content/i,"Step 3 of 5 — Fetching the city's files"],
+ [/lua|client info/i,"Step 4 of 5 — Building the city (your game may pause for a few seconds — that's normal, don't close it)"],[/spawn|entities|precach|sending/i,"Step 5 of 5 — Entering Miami"]];
+window.NCStage=function(s){for(var i=0;i<STAGES.length;i++){if(STAGES[i][0].test(s)){var t=$("tip");if(t){t.style.opacity=1;txt("tip",STAGES[i][1]);}window.NCStageLock=Date.now();return;}}};
+window.SetStatusChanged=function(s){s=String(s||"");txt("status",s);try{NCStage(s);}catch(e){}
  if(/workshop/i.test(s))setPct(10);if(/lua/i.test(s))setPct(80);if(/sending client info/i.test(s))setPct(92);if(/client info sent|starting lua/i.test(s))setPct(96);};
 setInterval(function(){if(lastPct<88)setPct(lastPct+.12);},1000);
 })();
