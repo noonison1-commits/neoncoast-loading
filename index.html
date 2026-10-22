@@ -274,37 +274,5 @@ window.SetStatusChanged=function(s){s=String(s||"");txt("status",s);try{NCStage(
 setInterval(function(){if(lastPct<88)setPct(lastPct+.12);},1000);
 })();
 </script>
-<!-- loading music: original synthesized track (loadingscreen/music/make_music_v2.py). Separate files next to this page. -->
-<style>
-#ncmute{position:absolute;right:18px;top:18px;z-index:50;width:44px;height:44px;border-radius:50%;border:2px solid #00e5ff;background:rgba(12,6,36,.8);color:#00e5ff;
- font:bold 18px "Segoe UI",Arial,sans-serif;line-height:40px;text-align:center;cursor:pointer;box-shadow:0 0 10px rgba(0,229,255,.7),inset 0 0 8px rgba(0,229,255,.35);text-shadow:0 0 6px #00e5ff;outline:none;padding:0}
-#ncmute.off{border-color:#ff3fae;color:#ff3fae;box-shadow:0 0 10px rgba(255,63,174,.7);text-shadow:0 0 6px #ff3fae}
-</style>
-<audio id="ncmusic" preload="auto"><source src="music.ogg" type="audio/ogg"><source src="music.mp3" type="audio/mpeg"></audio>
-<button id="ncmute" type="button" title="Mute / unmute music">&#9835;</button>
-<script>
-(function(){
-var a=document.getElementById("ncmusic"),btn=document.getElementById("ncmute");if(!a||!a.play)return;
-var VOL=0.35,LOOP_START=0,LOOP_END=114.85,muted=false,level=0,target=VOL,fadeT=null,done=false,started=false;
-try{muted=window.localStorage&&localStorage.getItem("nc_music_muted")==="1";}catch(e){}
-function paint(){btn.className=muted?"off":"";btn.innerHTML=muted?"&#215;":"&#9835;";}
-function apply(){try{a.volume=Math.max(0,Math.min(1,muted?0:level));}catch(e){}}
-function fadeTo(v,secs,cb){if(fadeT)clearInterval(fadeT);var from=level,steps=Math.max(1,Math.round(secs*20)),i=0;
- fadeT=setInterval(function(){i++;level=from+(v-from)*(i/steps);apply();if(i>=steps){clearInterval(fadeT);fadeT=null;if(cb)cb();}},50);}
-function start(){if(done||started)return;level=0;apply();var p;try{p=a.play();}catch(e){return;}
- if(p&&p.then){p.then(function(){started=true;fadeTo(target,1.5);},function(){});}else{started=true;fadeTo(target,1.5);}}
-a.addEventListener("timeupdate",function(){if(a.currentTime>=LOOP_END-0.08){a.currentTime=LOOP_START;}});
-a.addEventListener("ended",function(){if(!done){a.currentTime=LOOP_START;try{a.play();}catch(e){}}});
-function kick(){start();}
-document.addEventListener("click",kick);document.addEventListener("keydown",kick);
-btn.onclick=function(ev){if(ev&&ev.stopPropagation)ev.stopPropagation();muted=!muted;
- try{localStorage.setItem("nc_music_muted",muted?"1":"0");}catch(e){}paint();apply();start();};
-function finish(){if(done)return;done=true;fadeTo(0,3,function(){try{a.pause();}catch(e){}});}
-var prev=window.SetStatusChanged;
-window.SetStatusChanged=function(s){if(prev)try{prev(s);}catch(e){}if(/sending client info|client info sent/i.test(String(s||"")))finish();};
-setTimeout(finish,10*60*1000);
-paint();start();
-})();
-</script>
 </body>
 </html>
